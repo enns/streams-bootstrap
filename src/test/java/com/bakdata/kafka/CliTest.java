@@ -49,9 +49,9 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 class CliTest {
 
-    private static final int TIMEOUT_SECONDS = 10;
-    @Container
-    private final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"));
+//    private static final int TIMEOUT_SECONDS = 10;
+//    @Container
+//    private final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"));
 
     @Test
     @ExpectSystemExitWithStatus(0)
@@ -157,51 +157,51 @@ class CliTest {
         });
     }
 
-    private TopicClient createClient() {
-        final String brokerList = this.kafka.getBootstrapServers();
-        final Map<String, Object> config = Map.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);
-        return TopicClient.create(config, Duration.ofSeconds(20L));
-    }
-
-    @Test
-    @ExpectSystemExitWithStatus(1)
-    void shouldExitWithErrorInTopology() throws InterruptedException {
-        Thread.sleep(TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS));
-        final String input = "input";
-        final String output = "output";
-        try (final TopicClient client = this.createClient()) {
-            client.createTopic(input, TopicSettings.builder()
-                    .partitions(1)
-                    .replicationFactor((short) 1)
-                    .build(), Collections.emptyMap());
-        }
-        Thread.sleep(TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS));
-        KafkaStreamsApplication.startApplication(new KafkaStreamsApplication() {
-            @Override
-            public void buildTopology(final StreamsBuilder builder) {
-                builder.stream(this.getInputTopics(), Consumed.with(Serdes.ByteArray(), Serdes.ByteArray()))
-                        .peek((k, v) -> {
-                            throw new RuntimeException();
-                        });
-            }
-
-            @Override
-            public String getUniqueAppId() {
-                return "app";
-            }
-        }, new String[]{
-                "--brokers", this.kafka.getBootstrapServers(),
-                "--schema-registry-url", "http://localhost:8081",
-                "--input-topics", input,
-                "--output-topic", output,
-        });
-        try (final Producer<String, String> kafkaProducer = new KafkaProducer<>(
-                Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.kafka.getBootstrapServers()),
-                new StringSerializer(),
-                new StringSerializer()
-        )) {
-            kafkaProducer.send(new ProducerRecord<>(input, "foo", "bar"));
-            kafkaProducer.flush();
-        }
-    }
+//    private TopicClient createClient() {
+//        final String brokerList = this.kafka.getBootstrapServers();
+//        final Map<String, Object> config = Map.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);
+//        return TopicClient.create(config, Duration.ofSeconds(20L));
+//    }
+//
+//    @Test
+//    @ExpectSystemExitWithStatus(1)
+//    void shouldExitWithErrorInTopology() throws InterruptedException {
+//        Thread.sleep(TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS));
+//        final String input = "input";
+//        final String output = "output";
+//        try (final TopicClient client = this.createClient()) {
+//            client.createTopic(input, TopicSettings.builder()
+//                    .partitions(1)
+//                    .replicationFactor((short) 1)
+//                    .build(), Collections.emptyMap());
+//        }
+//        Thread.sleep(TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS));
+//        KafkaStreamsApplication.startApplication(new KafkaStreamsApplication() {
+//            @Override
+//            public void buildTopology(final StreamsBuilder builder) {
+//                builder.stream(this.getInputTopics(), Consumed.with(Serdes.ByteArray(), Serdes.ByteArray()))
+//                        .peek((k, v) -> {
+//                            throw new RuntimeException();
+//                        });
+//            }
+//
+//            @Override
+//            public String getUniqueAppId() {
+//                return "app";
+//            }
+//        }, new String[]{
+//                "--brokers", this.kafka.getBootstrapServers(),
+//                "--schema-registry-url", "http://localhost:8081",
+//                "--input-topics", input,
+//                "--output-topic", output,
+//        });
+//        try (final Producer<String, String> kafkaProducer = new KafkaProducer<>(
+//                Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.kafka.getBootstrapServers()),
+//                new StringSerializer(),
+//                new StringSerializer()
+//        )) {
+//            kafkaProducer.send(new ProducerRecord<>(input, "foo", "bar"));
+//            kafkaProducer.flush();
+//        }
+//    }
 }
