@@ -110,6 +110,9 @@ allprojects {
         testImplementation(group = "net.mguenther.kafka", name = "kafka-junit", version = kafkaVersion) {
             exclude(group = "org.slf4j", module = "slf4j-log4j12")
         }
+        val testcontainersVersion = "1.16.0"
+        testImplementation(group = "org.testcontainers", name = "kafka", version = testcontainersVersion)
+        testImplementation(group = "org.testcontainers", name = "junit-jupiter", version = testcontainersVersion)
 
         testImplementation(group = "com.ginsberg", name = "junit5-system-exit", version = "1.1.1")
     }

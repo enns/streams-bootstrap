@@ -96,7 +96,8 @@ public abstract class KafkaStreamsApplication extends KafkaApplication implement
         appPackageName = app.getClass().getPackageName();
         final String[] populatedArgs = addEnvironmentVariablesArguments(args);
         // deprecated command call is the only one that properly exits the application in both clean up and streams
-        CommandLine.run(app, System.out, populatedArgs);
+        final int exitCode = new CommandLine(app).execute(populatedArgs);
+        System.exit(exitCode);
     }
 
     @Override
